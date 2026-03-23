@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ESPRIT RUNNER — Se Former Autrement</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="gameWrapper">
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-left">
+      <span class="hud-label">SCORE</span>
+      <span class="hud-val" id="scoreDisplay">0</span>
+    </div>
+    <div class="hud-center">
+      <div id="espritLogo">
+        <span class="logo-esp">espr</span><span class="logo-it">it</span><span class="logo-arrow">▶</span>
+      </div>
+    </div>
+    <div class="hud-right">
+      <span class="hud-label">VIES</span>
+      <span class="hud-val" id="livesDisplay">♥♥♥</span>
+    </div>
+  </div>
+
+  <canvas id="gameCanvas" width="700" height="420"></canvas>
+
+  <div id="infoBar">
+    <span id="levelLabel">📍 HALL D'ENTRÉE</span>
+    <span id="collectLabel">📦 Collectés : <span id="collectCount">0</span> / <span id="collectTotal">8</span></span>
+    <span>← → Courir &nbsp;|&nbsp; ↑ Sauter &nbsp;|&nbsp; ESPACE Ramasser</span>
+  </div>
+
+  <!-- ══ ÉCRAN TITRE ══ -->
+  <div class="overlay" id="startScreen">
+    <div class="overlay-logo">
+      <span class="logo-esp">espr</span><span class="logo-it">it</span><span class="logo-arrow">▶</span>
+    </div>
+    <div class="overlay-sub">SE FORMER AUTREMENT</div>
+    <h2 class="overlay-title">ESPRIT RUNNER</h2>
+    <p class="overlay-desc">
+      Tu es un étudiant ESPRIT en retard !<br>
+      Cours dans les couloirs, collecte tes affaires<br>
+      et évite les profs qui patrouillent.
+    </p>
+    <div class="btn-row">
+      <button class="btn btn-red" id="startBtn">▶ CRÉER MA CARTE &amp; JOUER</button>
+    </div>
+  </div>
+
+  <!-- ══ ÉCRAN CARTE ÉTUDIANT ══ -->
+  <div class="overlay" id="cardScreen" style="display:none;">
+
+    <div id="cardScreenInner">
+
+      <!-- Colonne gauche : formulaire -->
+      <div id="cardForm">
+        <div class="form-title">
+          <span class="logo-esp">espr</span><span class="logo-it">it</span><span class="logo-arrow">▶</span>
+          <span style="margin-left:10px;font-size:13px;letter-spacing:2px;color:#666;">INSCRIPTION</span>
+        </div>
+        <p class="form-sub">Remplis ta carte étudiant avant de jouer !</p>
+
+        <div class="field-group">
+          <label>NOM</label>
+          <input type="text" id="fieldNom" placeholder="Ex : TOUMI" maxlength="20">
+        </div>
+        <div class="field-group">
+          <label>PRÉNOM</label>
+          <input type="text" id="fieldPrenom" placeholder="Ex : Syrine" maxlength="20">
+        </div>
+        <div class="field-group">
+          <label>CLASSE</label>
+          <input type="text" id="fieldClasse" placeholder="Ex : 4GamiX1" maxlength="15">
+        </div>
+        <div class="field-group">
+          <label>SPÉCIALITÉ</label>
+          <select id="fieldSpec">
+            
+            <option value="GamiX" selected>GamiX</option>
+            <option value="ArcTic">ArcTic</option>
+            <option value="Data">Data</option>
+            <option value="SAE">SAE</option>
+            <option value="SIM/SLIM">SIM/SLIM</option>
+            <option value="IOSys/ErpBi">IOSys/ErpBi</option>
+            <option value="IA">IA</option>
+            
+            <option value="IA & Data">IA &amp; Data</option>
+            
+            
+          </select>
+        </div>
+        <div class="field-group">
+          <label>PHOTO <span style="font-weight:400;color:#aaa;">(optionnel)</span></label>
+          <label class="photo-upload-btn" for="photoInput">📷 Choisir une photo</label>
+          <input type="file" id="photoInput" accept="image/*" style="display:none;">
+          <span id="photoName" style="font-size:10px;color:#aaa;margin-top:4px;display:block;">Aucune photo</span>
+        </div>
+
+        <div class="field-group">
+          <label>PERSONNAGE</label>
+          <div id="charChoice">
+            <div class="char-mini" id="miniMale" onclick="pickChar('boy')">
+              <canvas id="miniCanvasBoy" width="44" height="60"></canvas>
+              <span>GARÇON</span>
+            </div>
+            <div class="char-mini" id="miniFemale" onclick="pickChar('girl')">
+              <canvas id="miniCanvasGirl" width="44" height="60"></canvas>
+              <span>FILLE</span>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-red" id="confirmCardBtn" style="width:100%;margin-top:8px;" disabled>
+          🎓 GÉNÉRER MA CARTE
+        </button>
+      </div>
+
+      <!-- Colonne droite : aperçu carte -->
+      <div id="cardPreviewCol">
+        <p class="preview-label">APERÇU EN TEMPS RÉEL</p>
+        <canvas id="cardCanvas" width="340" height="210"></canvas>
+        <p class="preview-hint">La carte sera affichée dans le jeu !</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ ÉCRAN CARTE GÉNÉRÉE ══ -->
+  <div class="overlay" id="cardShowScreen" style="display:none;">
+    <div class="overlay-sub" style="margin-bottom:6px;">TA CARTE ÉTUDIANT ESPRIT</div>
+    <canvas id="cardFinalCanvas" width="420" height="260" style="box-shadow:8px 8px 0 rgba(0,0,0,0.2);"></canvas>
+    <p style="font-size:13px;color:#666;margin:12px 0 4px;">Bonne chance dans les couloirs, <span id="playerFirstName" style="color:#c0392b;font-weight:700;"></span> ! 🎓</p>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn-red" id="playNowBtn">▶ JOUER MAINTENANT</button>
+      <button class="btn btn-outline" id="editCardBtn">✏️ MODIFIER</button>
+    </div>
+  </div>
+
+  <!-- ══ GUIDE POPUP ══ -->
+  <div id="guideOverlay">
+    <div id="guideBox">
+      <div id="guideHeader">
+        <span>📖 GUIDE DU JOUEUR</span>
+        <button id="closeGuideBtn">✕</button>
+      </div>
+      <div class="guide-mission">🎯 Collecte tous les objets dans chaque zone de l'école pour avancer au niveau suivant !</div>
+      <div class="gs"><div class="gst">🗺️ LES 3 ZONES</div>
+        <div class="gr"><span class="glvl l1">Z1</span><span class="gd">Hall d'entrée — 8 objets à ramasser</span></div>
+        <div class="gr"><span class="glvl l2">Z2</span><span class="gd">Couloir des salles — 10 objets, profs en patrouille</span></div>
+        <div class="gr"><span class="glvl l3">Z3</span><span class="gd">Atelier Workshop — 12 objets, obstacles rapides</span></div>
+      </div>
+      <div class="gs"><div class="gst">📦 OBJETS À COLLECTER</div>
+        <div class="gr"><span class="gicon">📚</span><span class="gd"><b>Livre</b> — +10 pts</span></div>
+        <div class="gr"><span class="gicon">💻</span><span class="gd"><b>Laptop</b> — +20 pts</span></div>
+        <div class="gr"><span class="gicon">☕</span><span class="gd"><b>Café</b> — +5 pts (boost vitesse)</span></div>
+        <div class="gr"><span class="gicon">🎫</span><span class="gd"><b>Badge ESPRIT</b> — +30 pts (rare!)</span></div>
+      </div>
+      <div class="gtip">💡 <b>Astuce :</b> Les profs patrouillent en aller-retour — attends le bon moment !</div>
+      <button class="btn btn-outline" id="closeGuideBtn2" style="display:block;margin:0 auto;">✕ FERMER</button>
+    </div>
+  </div>
+
+  <!-- ══ LEVEL CLEAR ══ -->
+  <div class="overlay" id="levelScreen" style="display:none;">
+    <div class="overlay-logo"><span class="logo-esp">espr</span><span class="logo-it">it</span><span class="logo-arrow">▶</span></div>
+    <div class="overlay-title" id="levelClearTitle" style="font-size:26px;margin:8px 0;">ZONE TERMINÉE !</div>
+    <div class="overlay-desc" id="levelClearDesc"></div>
+    <div id="levelScore" style="font-size:22px;color:#c0392b;font-weight:900;margin:12px 0;"></div>
+    <button class="btn btn-red" id="nextLevelBtn">ZONE SUIVANTE ▶</button>
+  </div>
+
+  <!-- ══ GAME OVER ══ -->
+  <div class="overlay" id="gameOverScreen" style="display:none;">
+    <div class="overlay-title" style="color:#c0392b;">GAME OVER</div>
+    <div class="overlay-desc" id="goMsg">Tu t'es fait attraper par le prof !</div>
+    <div id="goScore" style="font-size:20px;color:#555;margin:12px 0;font-weight:700;"></div>
+    <div class="btn-row">
+      <button class="btn btn-red" id="restartBtn">↺ RECOMMENCER</button>
+      <button class="btn btn-outline" id="changeCardBtn">🎓 CHANGER DE CARTE</button>
+    </div>
+  </div>
+
+  <!-- ══ WIN ══ -->
+  <div class="overlay" id="winScreen" style="display:none;">
+    <div class="overlay-logo"><span class="logo-esp">espr</span><span class="logo-it">it</span><span class="logo-arrow">▶</span></div>
+    <div class="overlay-title" style="color:#27ae60;font-size:28px;">DIPLÔMÉ !</div>
+    <div class="overlay-desc" id="winMsg">Tu as traversé toute l'école ESPRIT ! 🎓</div>
+    <div id="winScore" style="font-size:24px;color:#c0392b;font-weight:900;margin:12px 0;"></div>
+    <canvas id="cardWinCanvas" width="280" height="175" style="box-shadow:4px 4px 0 rgba(0,0,0,0.15);margin-bottom:12px;"></canvas>
+    <div class="btn-row">
+      <button class="btn btn-red" id="winRestartBtn">↺ REJOUER</button>
+    </div>
+  </div>
+
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
